@@ -6,20 +6,19 @@ A touchscreen-based daily routine, productivity, and lifestyle tracker built on 
 
 ## Table of Contents
 
-1. Overview  
-2. Features  
-3. Parts List  
-4. Hardware Setup  
-5. Software Setup  
-6. Pages & Functionality  
-7. File Structure  
-8. Future Improvements  
+1. [Overview](#overview)  
+2. [Features](#features)
+3. [Parts List](#parts-list)  
+4. [Hardware Setup](#parts-list)
+5. [Software Setup](#software-setup)
+6. [Pages & Functionality](#pages)  
+7. [Future Improvements](#future-improvements)  
 
 ---
 
 ## Overview
 
-Routine Warden is a custom-built embedded system designed to help track:
+The Routine Warden is a custom-built embedded system designed to help track:
 
 - Daily routines (morning/night)
 - Meals
@@ -43,29 +42,46 @@ Routine Warden is a custom-built embedded system designed to help track:
 
 ## Parts List
 
-- Teensy 4.1  
-- Display: https://www.amazon.com/dp/B0751S46TS  
-- Command Strips: https://www.amazon.com/dp/B09LLMYBM1  
-- RTC Module: https://www.amazon.com/dp/B0FG2LRFZ2  
-- Bolts: https://www.amazon.com/dp/B0FG2LRFZ2  
-- Magnets: https://www.amazon.com/dp/B096LYVGPS  
-- Protoboard: https://www.amazon.com/Treedix-Solderable-BreadBoard-Universal-Prototyping/dp/B0896YPD8F  
+- [Teensy 4.1](https://www.amazon.com/PJRC-Teensy-4-1-with-Pins/dp/B08CTM3279)
+- [Display](https://www.amazon.com/dp/B0751S46TS)  
+- [Command Strips](https://www.amazon.com/dp/B09LLMYBM1)  
+- [RTC Module](https://www.amazon.com/dp/B0FG2LRFZ2)  
+- [Bolts](https://www.amazon.com/dp/B0FG2LRFZ2)  
+- [Magnets](https://www.amazon.com/dp/B096LYVGPS)  
+- [Protoboard](https://www.amazon.com/Treedix-Solderable-BreadBoard-Universal-Prototyping/dp/B0896YPD8F)  
 
 ---
 
 ## Software Setup
 
-Install Arduino IDE 1.8.19  
-https://www.arduino.cc/en/software  
+**Install Arduino IDE 1.8.19**
+Download: [Arduino IDE](https://www.arduino.cc/en/software)
+Make sure to install the 1.8.19 version, not Arduino 2.x
 
-Install Teensyduino  
-https://www.pjrc.com/teensy/td_download.html  
+**Install Teensyduino**  
+Download: [TeensyDuino](https://www.pjrc.com/teensy/td_download.html) 
+Follow the instructions and install TeensyDuino
 
-Install libraries via Arduino IDE:
-- ArduinoJson (v6.x)
-- RAK14014 FT6336U (GitHub ZIP install)
+**Install libraries via Arduino IDE:**
+1. Go to Sketch in the ribbon
+2. select include library
+3. select manage libraries
+4. search ArduinoJson
+5. install latest v6.x
 
-Select Board: Teensy 4.1  
+**Install libraries via zip import:**
+1. go to github repo: [RAK14014 touch library](https://github.com/RAKWireless/RAK14014-FT6336U)
+2. Download ZIP from GitHub
+3. Go back to Arduino IDE
+4. Select Sketch in the ribbon
+5. Select include library
+6. Select Add .ZIP library
+7. select downloaded ZIP file
+
+**Select Board:** 
+1. Go to Tools in the ribbon
+2. Select Board
+3. Seelct Teensy 4.1  
 
 ---
 
@@ -88,13 +104,6 @@ Tracks template, effort, energy, hunger, weight.
 
 ### Settings
 Toggle dark/light mode.
-
----
-
-## File Structure
-
-- routine_tracker.ino  
-- 3d_printing_files/  
 
 ---
 
