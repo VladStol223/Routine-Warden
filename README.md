@@ -45,7 +45,7 @@ The Routine Warden is a custom-built embedded system designed to help track:
 - [Teensy 4.1](https://www.amazon.com/PJRC-Teensy-4-1-with-Pins/dp/B08CTM3279)
 - [Display](https://www.amazon.com/dp/B0751S46TS)  
 - [Command Strips](https://www.amazon.com/dp/B09LLMYBM1)  
-- [RTC Module](https://www.amazon.com/dp/B0FG2LRFZ2)  
+- [RTC Module](https://www.amazon.com/dp/B09LLMYBM1?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1)  
 - [Bolts](https://www.amazon.com/dp/B0FG2LRFZ2)  
 - [Magnets](https://www.amazon.com/dp/B096LYVGPS)  
 - [Protoboard](https://www.amazon.com/Treedix-Solderable-BreadBoard-Universal-Prototyping/dp/B0896YPD8F)  
