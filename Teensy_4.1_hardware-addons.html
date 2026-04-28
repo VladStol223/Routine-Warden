@@ -1,0 +1,1071 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Teensy 4.1 Hardware Add-Ons — Routine Warden Expansion Guide</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161922;
+    --panel-2: #1d2230;
+    --ink: #e9ecf2;
+    --muted: #9aa3b2;
+    --accent: #7cc4ff;
+    --accent-2: #f6c177;
+    --good: #8bd5a8;
+    --warn: #f6a96b;
+    --line: #2a3040;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  }
+  header {
+    padding: 48px 24px 28px;
+    text-align: center;
+    background: radial-gradient(ellipse at top, #1c2336 0%, var(--bg) 70%);
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 { margin: 0 0 8px; font-size: 32px; letter-spacing: -0.02em; }
+  header p { margin: 4px auto; max-width: 760px; color: var(--muted); }
+  header .pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #243049;
+    color: var(--accent);
+    font-size: 12px;
+    margin: 8px 4px 0;
+    border: 1px solid #2c3a59;
+  }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 24px; }
+
+  nav.toc {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin: 8px 0 28px;
+  }
+  nav.toc h2 { margin: 0 0 8px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  nav.toc ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px 16px; }
+  nav.toc a { color: var(--accent); text-decoration: none; font-size: 14px; }
+  nav.toc a:hover { text-decoration: underline; }
+
+  section.category {
+    margin: 32px 0;
+  }
+  section.category h2 {
+    font-size: 22px;
+    margin: 0 0 4px;
+    border-left: 3px solid var(--accent);
+    padding-left: 10px;
+  }
+  section.category .blurb {
+    color: var(--muted);
+    margin: 0 0 16px;
+    padding-left: 13px;
+    font-size: 14px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card h3 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.3;
+  }
+  .card .price {
+    color: var(--accent-2);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .card .desc { color: var(--ink); font-size: 14px; margin: 0; }
+  .card .why {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
+    padding: 8px 10px;
+    background: var(--panel-2);
+    border-radius: 8px;
+    border-left: 2px solid var(--good);
+  }
+  .card .why b { color: var(--good); font-weight: 600; }
+  .card .iface {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .card .iface span {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    margin-right: 4px;
+    background: #11141c;
+  }
+  .card .buy {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .card .buy a {
+    font-size: 12px;
+    text-decoration: none;
+    color: var(--accent);
+    padding: 5px 10px;
+    border: 1px solid #2a3a55;
+    border-radius: 6px;
+    background: #182135;
+  }
+  .card .buy a:hover { background: #213050; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 32px 16px 48px;
+    border-top: 1px solid var(--line);
+    margin-top: 48px;
+  }
+  footer a { color: var(--accent); }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    font-size: 12px; color: var(--muted);
+    margin-top: 8px;
+  }
+  .legend span {
+    padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel);
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Teensy 4.1 Hardware Add-Ons</h1>
+  <p>A curated catalog of sensors, peripherals, and modules you can bolt onto your <b>Routine Warden</b> build (Teensy 4.1 + ILI9488 touch + DS3231 RTC + HX711 scale + SD).</p>
+  <p>
+    <span class="pill">Compatible with 3.3 V logic</span>
+    <span class="pill">Most use I²C / SPI / UART</span>
+    <span class="pill">Multiple vendors per item</span>
+  </p>
+</header>
+
+<main>
+  <nav class="toc">
+    <h2>Categories</h2>
+    <ul>
+      <li><a href="#audio">🎧 Audio &amp; Voice</a></li>
+      <li><a href="#wireless">📶 Wireless &amp; Connectivity</a></li>
+      <li><a href="#sensors-env">🌡️ Environmental Sensors</a></li>
+      <li><a href="#sensors-motion">🎯 Motion &amp; Position</a></li>
+      <li><a href="#sensors-bio">❤️ Biometric &amp; Health</a></li>
+      <li><a href="#input">🎛️ Input Devices</a></li>
+      <li><a href="#display">🖥️ Extra Displays &amp; Indicators</a></li>
+      <li><a href="#identity">🔑 Identity &amp; Access</a></li>
+      <li><a href="#power">🔋 Power &amp; Battery</a></li>
+      <li><a href="#memory">💾 Memory &amp; Storage</a></li>
+      <li><a href="#mechanical">⚙️ Motors &amp; Mechanical</a></li>
+      <li><a href="#vision">📸 Vision &amp; Imaging</a></li>
+    </ul>
+    <div class="legend">
+      <span>Prices in USD, approx. as of 2026</span>
+      <span>"Search" links go to vendor search pages</span>
+      <span>PJRC = Teensy's official maker</span>
+    </div>
+  </nav>
+
+  <!-- ============ AUDIO ============ -->
+  <section class="category" id="audio">
+    <h2>Audio &amp; Voice</h2>
+    <p class="blurb">Add chimes, voice notes, audio cues for routines, or even a mic for voice journaling.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>PJRC Audio Adaptor Board (Rev D)</h3>
+        <div class="price">~$15</div>
+        <p class="desc">Official Teensy audio shield with SGTL5000 codec — line in/out, headphone amp, mic preamp, microSD, integrates with the Teensy Audio Library.</p>
+        <p class="why"><b>Why for Routine Warden:</b> Polished alarm chimes, spoken affirmations, voice notes for the journal flow.</p>
+        <div class="iface"><span>I²S</span><span>I²C</span><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.pjrc.com/store/teensy3_audio.html" target="_blank" rel="noopener">PJRC Store</a>
+          <a href="https://www.adafruit.com/?q=teensy+audio" target="_blank" rel="noopener">Adafruit search</a>
+          <a href="https://www.amazon.com/s?k=teensy+audio+adaptor+board" target="_blank" rel="noopener">Amazon search</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Adafruit MAX98357 I²S Class-D Amp + Speaker</h3>
+        <div class="price">~$6 amp + $2–8 speaker</div>
+        <p class="desc">Cheap mono 3 W I²S DAC + amp — feeds a small 4 Ω / 8 Ω speaker directly. Lightest path to "make noise."</p>
+        <p class="why"><b>Why:</b> Cheaper alt to the audio shield if you just need beeps, alerts, and timer chimes.</p>
+        <div class="iface"><span>I²S</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/3006" target="_blank" rel="noopener">Adafruit #3006</a>
+          <a href="https://www.sparkfun.com/search/results?term=MAX98357" target="_blank" rel="noopener">SparkFun search</a>
+          <a href="https://www.amazon.com/s?k=MAX98357+I2S+amplifier" target="_blank" rel="noopener">Amazon search</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>INMP441 I²S MEMS Microphone</h3>
+        <div class="price">~$3–6</div>
+        <p class="desc">Omnidirectional digital mic on I²S — clean signal, no analog noise. Pairs well with the Teensy Audio Library.</p>
+        <p class="why"><b>Why:</b> Voice memos, ambient sound logging, future hot-word triggers.</p>
+        <div class="iface"><span>I²S</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=INMP441+microphone" target="_blank" rel="noopener">Amazon search</a>
+          <a href="https://www.aliexpress.com/wholesale?SearchText=INMP441" target="_blank" rel="noopener">AliExpress</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=INMP441" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>DFRobot Gravity Voice Recognition (DFR0177)</h3>
+        <div class="price">~$30</div>
+        <p class="desc">Offline voice command module — train your own phrases. Communicates over UART.</p>
+        <p class="why"><b>Why:</b> Mark routines done by voice ("morning done"), start timers hands-free.</p>
+        <div class="iface"><span>UART</span></div>
+        <div class="buy">
+          <a href="https://www.dfrobot.com/search.php?keywords=voice+recognition" target="_blank" rel="noopener">DFRobot</a>
+          <a href="https://www.amazon.com/s?k=arduino+voice+recognition+module" target="_blank" rel="noopener">Amazon search</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=DFR0177" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Piezo Buzzer (Active or Passive)</h3>
+        <div class="price">~$1–3</div>
+        <p class="desc">Cheapest possible audible alert. Active = on/off tone, passive = drive frequencies for melodies.</p>
+        <p class="why"><b>Why:</b> Timer expiry beep, routine-complete confirmation tone — no audio shield required.</p>
+        <div class="iface"><span>GPIO</span><span>PWM</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=piezo+buzzer+arduino+kit" target="_blank" rel="noopener">Amazon search</a>
+          <a href="https://www.sparkfun.com/search/results?term=buzzer" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.adafruit.com/?q=piezo+buzzer" target="_blank" rel="noopener">Adafruit</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ WIRELESS ============ -->
+  <section class="category" id="wireless">
+    <h2>Wireless &amp; Connectivity</h2>
+    <p class="blurb">Sync logs to the cloud, push notifications to your phone, or pull weather data into your routine.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>ESP32 / ESP8266 (as Wi-Fi co-processor)</h3>
+        <div class="price">~$5–12</div>
+        <p class="desc">Run AT firmware (or custom) and bridge over UART. ESP32 also gives you Bluetooth/BLE.</p>
+        <p class="why"><b>Why:</b> Sync your CSV logs to Google Sheets / Home Assistant; pull weather/calendar.</p>
+        <div class="iface"><span>UART</span><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=ESP32" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=ESP32" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=ESP32+devkit" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>WIZnet WIZ850io / WIZ820io Ethernet</h3>
+        <div class="price">~$20–25</div>
+        <p class="desc">Hardware TCP/IP stack on SPI — Teensy 4.1 has a dedicated footprint and Ethernet pins.</p>
+        <p class="why"><b>Why:</b> If your desk has Ethernet, this is rock-solid sync without Wi-Fi flakiness.</p>
+        <div class="iface"><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.pjrc.com/store/wiz820io.html" target="_blank" rel="noopener">PJRC WIZ820io</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=WIZ850io" target="_blank" rel="noopener">DigiKey</a>
+          <a href="https://www.mouser.com/c/?q=WIZ850io" target="_blank" rel="noopener">Mouser</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Teensy 4.1 Ethernet Kit (Magjack + components)</h3>
+        <div class="price">~$8</div>
+        <p class="desc">Native 10/100 Ethernet using the Teensy 4.1's onboard PHY pins — solder a magjack and a few passives.</p>
+        <p class="why"><b>Why:</b> Cheaper than WIZnet if you're comfortable soldering; uses the NativeEthernet library.</p>
+        <div class="iface"><span>RMII</span></div>
+        <div class="buy">
+          <a href="https://www.pjrc.com/store/ethernet_kit.html" target="_blank" rel="noopener">PJRC Ethernet Kit</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=teensy+ethernet+kit" target="_blank" rel="noopener">DigiKey search</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>HC-05 / HC-06 Bluetooth (Classic SPP)</h3>
+        <div class="price">~$5–10</div>
+        <p class="desc">Old-school serial-over-Bluetooth. Pair with a phone, get a virtual COM port.</p>
+        <p class="why"><b>Why:</b> Quick way to dump logs to your phone without USB.</p>
+        <div class="iface"><span>UART</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=HC-05+bluetooth+module" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.aliexpress.com/wholesale?SearchText=HC-05" target="_blank" rel="noopener">AliExpress</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Adafruit Bluefruit LE / nRF52840 BLE module</h3>
+        <div class="price">~$15–25</div>
+        <p class="desc">Modern BLE — pair with iOS/Android, expose characteristics for stats.</p>
+        <p class="why"><b>Why:</b> Build a companion phone app that reads today's progress over BLE.</p>
+        <div class="iface"><span>UART</span><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=bluefruit" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=nrf52840" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=nrf52840+module" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>RFM95W LoRa Module (915 MHz US)</h3>
+        <div class="price">~$15–20</div>
+        <p class="desc">Long-range, low-power RF — kilometers in clear line-of-sight.</p>
+        <p class="why"><b>Why:</b> Probably overkill for a desk tracker, but cool for a "remote button" you carry on a run.</p>
+        <div class="iface"><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=RFM95" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=RFM95" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=RFM95W" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>nRF24L01+ (2.4 GHz radio pair)</h3>
+        <div class="price">~$2–6 per node</div>
+        <p class="desc">Dirt-cheap 2.4 GHz transceiver — used for talking to other Arduinos/Teensys.</p>
+        <p class="why"><b>Why:</b> Bedroom node + kitchen node + tracker — distributed routine sensors.</p>
+        <div class="iface"><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=nRF24L01" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.sparkfun.com/search/results?term=nRF24L01" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ ENV SENSORS ============ -->
+  <section class="category" id="sensors-env">
+    <h2>Environmental Sensors</h2>
+    <p class="blurb">Quietly correlate sleep / focus / mood with your room's temperature, humidity, light, air, and noise.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Bosch BME280 (temp / humidity / pressure)</h3>
+        <div class="price">~$5–15</div>
+        <p class="desc">The classic three-in-one weather sensor. Solid accuracy for the price.</p>
+        <p class="why"><b>Why:</b> Log room conditions alongside daily mood / energy entries.</p>
+        <div class="iface"><span>I²C</span><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/2652" target="_blank" rel="noopener">Adafruit #2652</a>
+          <a href="https://www.sparkfun.com/search/results?term=BME280" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=BME280+module" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>SHT31-D / SHT41 (humidity + temp)</h3>
+        <div class="price">~$10–15</div>
+        <p class="desc">Higher accuracy humidity than BME280 — calibrated, very stable.</p>
+        <p class="why"><b>Why:</b> If sleep/comfort is a focus, humidity matters more than people think.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=SHT31" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=SHT31" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=SHT31-D" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>BH1750 / VEML7700 Ambient Light</h3>
+        <div class="price">~$3–6</div>
+        <p class="desc">Lux measurement over I²C — wide dynamic range.</p>
+        <p class="why"><b>Why:</b> Auto-dim the display at night; correlate light exposure with sleep onset.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=VEML7700" target="_blank" rel="noopener">Adafruit VEML7700</a>
+          <a href="https://www.amazon.com/s?k=BH1750+light+sensor" target="_blank" rel="noopener">Amazon BH1750</a>
+          <a href="https://www.sparkfun.com/search/results?term=light+sensor" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>SCD40 / SCD41 CO₂ Sensor</h3>
+        <div class="price">~$50–60</div>
+        <p class="desc">True NDIR CO₂ + temp/humidity. Best-in-class for indoor air quality.</p>
+        <p class="why"><b>Why:</b> CO₂ tracks focus/cognition surprisingly well — fascinating data for a productivity device.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=SCD40" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=SCD40" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=SCD41" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>SGP40 / SGP41 VOC / Air Quality</h3>
+        <div class="price">~$15–20</div>
+        <p class="desc">Volatile organic compound index — proxy for "stuffy" air, cleaning solvents, off-gassing.</p>
+        <p class="why"><b>Why:</b> Cheap complement to CO₂; pairs nicely with humidity.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=SGP40" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=SGP40" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=SGP40+air+quality" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>PMS5003 Particulate Matter (PM2.5)</h3>
+        <div class="price">~$25–40</div>
+        <p class="desc">Laser PM1.0 / PM2.5 / PM10. Bulky but reliable.</p>
+        <p class="why"><b>Why:</b> Wildfire-season air quality in your room logged alongside health metrics.</p>
+        <div class="iface"><span>UART</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=PMS5003" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=PMS5003" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=PMS5003" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>SPL Sound Level / MEMS Mic Module</h3>
+        <div class="price">~$8–15</div>
+        <p class="desc">Analog mic with an envelope/peak detector — read average ambient dB.</p>
+        <p class="why"><b>Why:</b> Detect a "quiet study session" automatically; log noisy distractions.</p>
+        <div class="iface"><span>Analog</span><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=sound+sensor" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=sound+detector" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=MAX9814+microphone" target="_blank" rel="noopener">Amazon MAX9814</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>VEML6075 / LTR390 UV Sensor</h3>
+        <div class="price">~$5–10</div>
+        <p class="desc">Real UV-A/UV-B index, not just generic light.</p>
+        <p class="why"><b>Why:</b> Clip-on near a window → log daily UV exposure as a wellness metric.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=LTR390" target="_blank" rel="noopener">Adafruit LTR390</a>
+          <a href="https://www.amazon.com/s?k=VEML6075+UV+sensor" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ MOTION ============ -->
+  <section class="category" id="sensors-motion">
+    <h2>Motion &amp; Position</h2>
+    <p class="blurb">Detect presence at the desk, count steps, log orientation, sense taps to wake the screen.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>PIR Motion Sensor (HC-SR501 / AM312)</h3>
+        <div class="price">~$2–6</div>
+        <p class="desc">Passive IR — fires a digital pulse when a warm body moves nearby.</p>
+        <p class="why"><b>Why:</b> Wake the display when you sit down; auto-sleep when you've been gone N minutes.</p>
+        <div class="iface"><span>GPIO</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=PIR+motion+sensor+HC-SR501" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.adafruit.com/?q=PIR+sensor" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=PIR" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>VL53L1X / VL53L0X Time-of-Flight Distance</h3>
+        <div class="price">~$10–15</div>
+        <p class="desc">Laser-based mm-accurate distance up to ~4 m.</p>
+        <p class="why"><b>Why:</b> Accurate "are you at the desk" detection without false PIR triggers.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=VL53L1X" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=VL53L1X" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=VL53L1X" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Bosch BNO055 9-DoF IMU</h3>
+        <div class="price">~$25–35</div>
+        <p class="desc">Onboard sensor fusion — gives you absolute orientation directly.</p>
+        <p class="why"><b>Why:</b> Tap-to-wake, "shake to dismiss," tilt-aware UI.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/2472" target="_blank" rel="noopener">Adafruit #2472</a>
+          <a href="https://www.sparkfun.com/search/results?term=BNO055" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=BNO055" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>MPU-6050 / MPU-9250 / LSM6DS3 Accel+Gyro</h3>
+        <div class="price">~$3–12</div>
+        <p class="desc">6 / 9-axis IMU. Cheap, well-documented.</p>
+        <p class="why"><b>Why:</b> Pedometer mode, "did I do my stretches" detection, exercise tracker enhancements.</p>
+        <div class="iface"><span>I²C</span><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=LSM6DS3" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=MPU-9250" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=MPU6050" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>U-blox NEO-6M / NEO-M9N GPS</h3>
+        <div class="price">~$10–80</div>
+        <p class="desc">Position, time, and altitude. NEO-M9N is much faster lock + multi-constellation.</p>
+        <p class="why"><b>Why:</b> Auto-tag exercise sessions with location; ultra-precise time sync vs. DS3231.</p>
+        <div class="iface"><span>UART</span><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=GPS" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=NEO-M9N" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=NEO-6M+GPS" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ BIOMETRIC ============ -->
+  <section class="category" id="sensors-bio">
+    <h2>Biometric &amp; Health</h2>
+    <p class="blurb">Pulse, SpO₂, body temp — "wellness" data at the desk.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>MAX30102 / MAX30105 Pulse Ox</h3>
+        <div class="price">~$8–15</div>
+        <p class="desc">Heart rate + SpO₂ from a fingertip. Not medical-grade but fun.</p>
+        <p class="why"><b>Why:</b> "Resting HR" daily entry tile; HRV trend over time.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.sparkfun.com/products/15219" target="_blank" rel="noopener">SparkFun #15219</a>
+          <a href="https://www.adafruit.com/?q=MAX30102" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.amazon.com/s?k=MAX30102" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>MLX90614 Non-contact IR Temp</h3>
+        <div class="price">~$10–20</div>
+        <p class="desc">Forehead/object IR temperature without contact.</p>
+        <p class="why"><b>Why:</b> Quick "am I getting sick" check before logging the day.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=MLX90614" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=MLX90614" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=MLX90614" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>AD8232 Single-Lead ECG</h3>
+        <div class="price">~$15–25</div>
+        <p class="desc">Analog front-end for an actual ECG waveform. Add electrodes.</p>
+        <p class="why"><b>Why:</b> Hardcore mode — record HRV from a real ECG once a day.</p>
+        <div class="iface"><span>Analog</span></div>
+        <div class="buy">
+          <a href="https://www.sparkfun.com/products/12650" target="_blank" rel="noopener">SparkFun #12650</a>
+          <a href="https://www.amazon.com/s?k=AD8232+ECG" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=AD8232" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>GSR (Grove Galvanic Skin Response)</h3>
+        <div class="price">~$15–25</div>
+        <p class="desc">Two-finger electrodes measuring skin conductance — a stress proxy.</p>
+        <p class="why"><b>Why:</b> "Stress score" before/after study sessions or workouts.</p>
+        <div class="iface"><span>Analog</span></div>
+        <div class="buy">
+          <a href="https://www.seeedstudio.com/catalogsearch/result/?q=GSR" target="_blank" rel="noopener">Seeed Studio</a>
+          <a href="https://www.amazon.com/s?k=Grove+GSR+sensor" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Additional Load Cells for the HX711</h3>
+        <div class="price">~$5–25</div>
+        <p class="desc">You already have one — extras unlock new flows: bodyweight scale, water-bottle tracker, "is the dog at the bowl" plate.</p>
+        <p class="why"><b>Why:</b> Re-uses your existing HX711 driver code. Different ranges (1 kg, 5 kg, 50 kg, 200 kg).</p>
+        <div class="iface"><span>HX711</span></div>
+        <div class="buy">
+          <a href="https://www.sparkfun.com/search/results?term=load+cell" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.adafruit.com/?q=load+cell" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.amazon.com/s?k=load+cell+HX711" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ INPUT ============ -->
+  <section class="category" id="input">
+    <h2>Input Devices</h2>
+    <p class="blurb">You already have touch — these add tactility, hotkeys, or text entry.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Rotary Encoder (with push-button)</h3>
+        <div class="price">~$2–5</div>
+        <p class="desc">Click + scroll. The classic "set timer" / "scroll list" input.</p>
+        <p class="why"><b>Why:</b> Adjust timer minutes or scrub through meals without touching the screen.</p>
+        <div class="iface"><span>GPIO</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=rotary+encoder" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=rotary+encoder" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=rotary+encoder+module" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Mechanical Keyswitch / Cherry Switch</h3>
+        <div class="price">~$1 each</div>
+        <p class="desc">Single physical hot-key — satisfying click for "done."</p>
+        <p class="why"><b>Why:</b> Big "I did it" button on the side of the case to mark routines complete.</p>
+        <div class="iface"><span>GPIO</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=cherry+mx+switches" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.adafruit.com/?q=keyswitch" target="_blank" rel="noopener">Adafruit</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>4×4 Membrane Keypad</h3>
+        <div class="price">~$3–6</div>
+        <p class="desc">Numeric / hotkey grid — wires up as a matrix.</p>
+        <p class="why"><b>Why:</b> Fast keypad entry for grams or calories without slider tapping.</p>
+        <div class="iface"><span>GPIO</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=membrane+keypad" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.amazon.com/s?k=4x4+membrane+keypad" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.sparkfun.com/search/results?term=keypad" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Adafruit MPR121 12-Channel Cap-Touch</h3>
+        <div class="price">~$8</div>
+        <p class="desc">Up to 12 capacitive touch pads from any conductive material.</p>
+        <p class="why"><b>Why:</b> Build hidden "touch dots" right into the 3D-printed enclosure.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/1982" target="_blank" rel="noopener">Adafruit #1982</a>
+          <a href="https://www.sparkfun.com/search/results?term=MPR121" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=MPR121" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>USB Host Port (already on Teensy 4.1!)</h3>
+        <div class="price">~$2 cable + free</div>
+        <p class="desc">Teensy 4.1 has built-in USB Host pads — solder a 5-pin header + USB-A breakout for full host mode.</p>
+        <p class="why"><b>Why:</b> Plug in a real USB keyboard for fast text notes; or a barcode scanner.</p>
+        <div class="iface"><span>USB Host</span></div>
+        <div class="buy">
+          <a href="https://www.pjrc.com/store/cable_usb_host_t36.html" target="_blank" rel="noopener">PJRC USB Host cable</a>
+          <a href="https://www.adafruit.com/?q=USB-A+breakout" target="_blank" rel="noopener">Adafruit USB breakouts</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ DISPLAYS ============ -->
+  <section class="category" id="display">
+    <h2>Extra Displays &amp; Indicators</h2>
+    <p class="blurb">Status lights, secondary info, ambient glow.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>WS2812B / NeoPixel Strip or Ring</h3>
+        <div class="price">~$5–25</div>
+        <p class="desc">Individually addressable RGB LEDs. One data pin drives hundreds.</p>
+        <p class="why"><b>Why:</b> Ambient "routine progress" glow ring around the device; red/green status without looking at the screen.</p>
+        <div class="iface"><span>GPIO</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=neopixel" target="_blank" rel="noopener">Adafruit NeoPixel</a>
+          <a href="https://www.sparkfun.com/search/results?term=WS2812" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=WS2812B+strip" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>SSD1306 0.96" OLED (128×64)</h3>
+        <div class="price">~$4–8</div>
+        <p class="desc">Tiny secondary status display — text + icons.</p>
+        <p class="why"><b>Why:</b> Always-on "tiny widget" face you can put on a side panel showing time + next task while the main screen sleeps.</p>
+        <div class="iface"><span>I²C</span><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/938" target="_blank" rel="noopener">Adafruit #938</a>
+          <a href="https://www.amazon.com/s?k=SSD1306+OLED" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.sparkfun.com/search/results?term=SSD1306" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Waveshare 2.9" / 4.2" E-Ink Display</h3>
+        <div class="price">~$25–60</div>
+        <p class="desc">Persistent low-power image — keeps its display with no power.</p>
+        <p class="why"><b>Why:</b> Daily "what to do today" panel that doesn't drain anything; great for sleep / morning rituals.</p>
+        <div class="iface"><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.waveshare.com/product/displays/e-paper.htm" target="_blank" rel="noopener">Waveshare</a>
+          <a href="https://www.adafruit.com/?q=eink" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.amazon.com/s?k=waveshare+e-paper" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>TM1637 4-Digit 7-Segment</h3>
+        <div class="price">~$2–5</div>
+        <p class="desc">Classic glowing red/green/blue digits — clock or countdown.</p>
+        <p class="why"><b>Why:</b> Big visible countdown when the screen is off.</p>
+        <div class="iface"><span>GPIO</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=TM1637+display" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.adafruit.com/?q=7-segment" target="_blank" rel="noopener">Adafruit</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Vibration Motor (Coin / Linear Resonant Actuator)</h3>
+        <div class="price">~$2–10</div>
+        <p class="desc">Small disc/LRA motor + driver (DRV2605L recommended).</p>
+        <p class="why"><b>Why:</b> Silent haptic alerts for routine reminders — won't wake roommates.</p>
+        <div class="iface"><span>GPIO</span><span>I²C (driver)</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=DRV2605" target="_blank" rel="noopener">Adafruit DRV2605</a>
+          <a href="https://www.sparkfun.com/search/results?term=haptic+motor" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=vibration+motor+arduino" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ IDENTITY ============ -->
+  <section class="category" id="identity">
+    <h2>Identity &amp; Access</h2>
+    <p class="blurb">Multi-user mode, badge in/out, food barcode lookup.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>PN532 NFC / RFID Module</h3>
+        <div class="price">~$10–25</div>
+        <p class="desc">Reads MIFARE / NTAG cards; can also act as a card. SPI/I²C/UART selectable.</p>
+        <p class="why"><b>Why:</b> Tap a card to switch users; tap NFC food labels for instant meal logging.</p>
+        <div class="iface"><span>I²C</span><span>SPI</span><span>UART</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/364" target="_blank" rel="noopener">Adafruit #364</a>
+          <a href="https://www.sparkfun.com/search/results?term=PN532" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=PN532+NFC" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>RC522 RFID (cheap)</h3>
+        <div class="price">~$3–5</div>
+        <p class="desc">Budget MIFARE reader — comes with a card and key fob.</p>
+        <p class="why"><b>Why:</b> Sub-$5 user-switching solution.</p>
+        <div class="iface"><span>SPI</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=RC522+RFID" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.aliexpress.com/wholesale?SearchText=RC522" target="_blank" rel="noopener">AliExpress</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>R307 / R503 Optical Fingerprint Sensor</h3>
+        <div class="price">~$15–35</div>
+        <p class="desc">Stores fingerprint templates onboard, returns matched ID over UART.</p>
+        <p class="why"><b>Why:</b> Discreet biometric login if multiple people use the device.</p>
+        <div class="iface"><span>UART</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=fingerprint" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.amazon.com/s?k=R307+fingerprint" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.sparkfun.com/search/results?term=fingerprint" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>USB Barcode Scanner (HID)</h3>
+        <div class="price">~$15–35</div>
+        <p class="desc">Acts as a keyboard — types the scanned code. Teensy 4.1 USB Host can read it.</p>
+        <p class="why"><b>Why:</b> Scan packaged-food barcodes → look up in a local food DB on the SD card → auto-log.</p>
+        <div class="iface"><span>USB Host</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=USB+barcode+scanner+1D+2D" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ POWER ============ -->
+  <section class="category" id="power">
+    <h2>Power &amp; Battery</h2>
+    <p class="blurb">Cut the USB cord — go portable, or just survive power blips.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Adafruit PowerBoost 1000C + LiPo</h3>
+        <div class="price">~$20 board + $10–20 battery</div>
+        <p class="desc">Charges a 3.7 V LiPo from USB and boosts to 5 V — clean swap from wall power.</p>
+        <p class="why"><b>Why:</b> Take Routine Warden bedside or on the go without rewiring anything.</p>
+        <div class="iface"><span>5V out</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/2465" target="_blank" rel="noopener">Adafruit #2465</a>
+          <a href="https://www.adafruit.com/?q=lipo+battery" target="_blank" rel="noopener">Adafruit batteries</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>TP4056 LiPo Charger Module</h3>
+        <div class="price">~$1 each (10-pack ~$8)</div>
+        <p class="desc">Bare-bones single-cell USB charger. Often paired with a discrete boost converter.</p>
+        <p class="why"><b>Why:</b> Cheapest path to battery operation if you're DIY-comfortable.</p>
+        <div class="iface"><span>—</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=TP4056+module" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.aliexpress.com/wholesale?SearchText=TP4056" target="_blank" rel="noopener">AliExpress</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>INA219 / INA260 Current &amp; Power Monitor</h3>
+        <div class="price">~$5–10</div>
+        <p class="desc">Reads voltage / current / power over I²C — perfect for "how much juice am I drawing."</p>
+        <p class="why"><b>Why:</b> Battery % gauge; debug power consumption per peripheral.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=INA219" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=INA219" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=INA219" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Adafruit USB Type-C breakout</h3>
+        <div class="price">~$5</div>
+        <p class="desc">Modern USB-C jack for clean wall-power input.</p>
+        <p class="why"><b>Why:</b> Replace the micro-USB with USB-C in the enclosure for 2026-era cables.</p>
+        <div class="iface"><span>USB</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=USB-C+breakout" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=USB-C+breakout" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=USB-C+breakout+board" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>CR2032 Coin Cell + Holder (RTC backup)</h3>
+        <div class="price">~$2–5</div>
+        <p class="desc">Keeps the DS3231 ticking when USB is unplugged.</p>
+        <p class="why"><b>Why:</b> If you don't already have one wired up, an RTC battery prevents clock loss across power-cycles.</p>
+        <div class="iface"><span>—</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=CR2032+holder+through+hole" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=CR2032+holder" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ MEMORY ============ -->
+  <section class="category" id="memory">
+    <h2>Memory &amp; Storage</h2>
+    <p class="blurb">Teensy 4.1 has unique footprints on the bottom side — both PSRAM and Flash.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>PSRAM Chips for Teensy 4.1 (8 MB)</h3>
+        <div class="price">~$4 each</div>
+        <p class="desc">Two PSRAM solder pads on the bottom of the Teensy 4.1. Drop in two 8 MB chips → 16 MB extra RAM.</p>
+        <p class="why"><b>Why:</b> Big in-RAM caches for graphs/charts, on-device analytics, audio buffers.</p>
+        <div class="iface"><span>onboard</span></div>
+        <div class="buy">
+          <a href="https://www.pjrc.com/store/psram.html" target="_blank" rel="noopener">PJRC PSRAM</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=APS6404L-3SQR" target="_blank" rel="noopener">DigiKey</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>NOR Flash for Teensy 4.1 (W25Q128/256)</h3>
+        <div class="price">~$2–6</div>
+        <p class="desc">Solder-on QSPI flash for log files, fonts, audio samples.</p>
+        <p class="why"><b>Why:</b> Faster access than SD for things like fonts / icon assets.</p>
+        <div class="iface"><span>onboard QSPI</span></div>
+        <div class="buy">
+          <a href="https://www.pjrc.com/store/psram.html" target="_blank" rel="noopener">PJRC notes</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=W25Q128" target="_blank" rel="noopener">DigiKey</a>
+          <a href="https://www.mouser.com/c/?q=W25Q128" target="_blank" rel="noopener">Mouser</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>High-endurance microSD card</h3>
+        <div class="price">~$10–25</div>
+        <p class="desc">SanDisk High Endurance / Samsung PRO Endurance — built for constant logging.</p>
+        <p class="why"><b>Why:</b> Routine Warden writes daily. Endurance cards last years longer than consumer cards.</p>
+        <div class="iface"><span>SD</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=sandisk+high+endurance+microsd" target="_blank" rel="noopener">Amazon SanDisk</a>
+          <a href="https://www.amazon.com/s?k=samsung+pro+endurance+microsd" target="_blank" rel="noopener">Amazon Samsung</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>External I²C EEPROM (24LC256 / FRAM MB85RC256V)</h3>
+        <div class="price">~$2–10</div>
+        <p class="desc">Nonvolatile bytes that survive power loss — FRAM has unlimited write cycles.</p>
+        <p class="why"><b>Why:</b> Tiny config / theme / streak counters that you don't want SD-card latency for.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=FRAM+I2C" target="_blank" rel="noopener">Adafruit FRAM</a>
+          <a href="https://www.sparkfun.com/search/results?term=FRAM" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.digikey.com/en/products/result?keywords=24LC256" target="_blank" rel="noopener">DigiKey EEPROM</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ MECHANICAL ============ -->
+  <section class="category" id="mechanical">
+    <h2>Motors &amp; Mechanical</h2>
+    <p class="blurb">Make the world move when a routine fires.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>SG90 / MG90S Hobby Servo</h3>
+        <div class="price">~$3–8</div>
+        <p class="desc">Small position-controllable motor — ~180°.</p>
+        <p class="why"><b>Why:</b> "Pomodoro flag" pops up when a study cycle ends; physical morning-routine indicator.</p>
+        <div class="iface"><span>PWM</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=micro+servo" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.amazon.com/s?k=SG90+servo" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.sparkfun.com/search/results?term=servo" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>5 V Single-Channel Relay Module</h3>
+        <div class="price">~$2–8</div>
+        <p class="desc">Switch a wall-powered device on/off (use safely!).</p>
+        <p class="why"><b>Why:</b> Auto-turn-on a desk lamp at "morning routine start."</p>
+        <div class="iface"><span>GPIO</span></div>
+        <div class="buy">
+          <a href="https://www.amazon.com/s?k=5v+relay+module" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.adafruit.com/?q=relay" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=relay" target="_blank" rel="noopener">SparkFun</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Solenoid + MOSFET driver</h3>
+        <div class="price">~$8–20</div>
+        <p class="desc">Push/pull mechanism — pop a drawer, flick a flag, ring a real bell.</p>
+        <p class="why"><b>Why:</b> Tactile reward — physical bell ding for finishing a routine.</p>
+        <div class="iface"><span>GPIO + driver</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/?q=solenoid" target="_blank" rel="noopener">Adafruit</a>
+          <a href="https://www.sparkfun.com/search/results?term=solenoid" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=12v+solenoid" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ VISION ============ -->
+  <section class="category" id="vision">
+    <h2>Vision &amp; Imaging</h2>
+    <p class="blurb">Photo logging, food recognition (with cloud help), or thermal imaging fun.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>OV2640 / OV5640 Camera Module + Arducam</h3>
+        <div class="price">~$10–35</div>
+        <p class="desc">Small JPEG-capable camera. Arducam mini SPI versions are easiest with Teensy.</p>
+        <p class="why"><b>Why:</b> Snap a photo of each meal next to its weight — visual food log.</p>
+        <div class="iface"><span>SPI</span><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.arducam.com/" target="_blank" rel="noopener">Arducam</a>
+          <a href="https://www.amazon.com/s?k=Arducam+OV2640" target="_blank" rel="noopener">Amazon</a>
+          <a href="https://www.adafruit.com/?q=arducam" target="_blank" rel="noopener">Adafruit</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>AMG8833 8×8 IR Thermal Camera</h3>
+        <div class="price">~$30–50</div>
+        <p class="desc">Low-res thermal grid — enough to "see" a person.</p>
+        <p class="why"><b>Why:</b> Detect "human at desk" without a camera image — privacy-friendly presence.</p>
+        <div class="iface"><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.adafruit.com/product/3538" target="_blank" rel="noopener">Adafruit #3538</a>
+          <a href="https://www.sparkfun.com/search/results?term=AMG8833" target="_blank" rel="noopener">SparkFun</a>
+          <a href="https://www.amazon.com/s?k=AMG8833" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>HuskyLens AI Vision Sensor</h3>
+        <div class="price">~$45–60</div>
+        <p class="desc">Onboard AI for face/object/color recognition — talks to MCU over UART/I²C.</p>
+        <p class="why"><b>Why:</b> "Show your plate to the camera" → it identifies the food category and logs it.</p>
+        <div class="iface"><span>UART</span><span>I²C</span></div>
+        <div class="buy">
+          <a href="https://www.dfrobot.com/search.php?keywords=huskylens" target="_blank" rel="noopener">DFRobot</a>
+          <a href="https://www.amazon.com/s?k=HuskyLens" target="_blank" rel="noopener">Amazon</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>
+    Generated for the Routine Warden hardware exploration —
+    Teensy 4.1 + ILI9488 touch + DS3231 + HX711.
+    Prices are approximate (USD, ~2026) and fluctuate by vendor.
+    Verify pin-availability and library support before buying.
+  </p>
+  <p>
+    Quick refs:
+    <a href="https://www.pjrc.com/store/teensy41.html" target="_blank" rel="noopener">Teensy 4.1 datasheet/store</a> ·
+    <a href="https://www.pjrc.com/teensy/td_libs.html" target="_blank" rel="noopener">Teensy library list</a> ·
+    <a href="https://forum.pjrc.com/" target="_blank" rel="noopener">PJRC forum</a>
+  </p>
+</footer>
+
+</body>
+</html>
